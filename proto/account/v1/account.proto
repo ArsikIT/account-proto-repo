@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package account.v1;
+
+option go_package = "github.com/ArsikIT/account-proto-repo/gen/go/account/v1;accountv1";
+
+import "google/protobuf/timestamp.proto";
+
+service AccountService {
+  rpc CreateAccount(CreateAccountRequest) returns (AccountResponse);
+  rpc GetAccountById(GetAccountByIdRequest) returns (AccountResponse);
+  rpc GetAccountByNumber(GetAccountByNumberRequest) returns (AccountResponse);
+  rpc GetAccountsByUserId(GetAccountsByUserIdRequest) returns (GetAccountsByUserIdResponse);
+  rpc GetBalance(GetBalanceRequest) returns (GetBalanceResponse);
+  rpc UpdateAccountStatus(UpdateAccountStatusRequest) returns (AccountResponse);
+  rpc FreezeAccount(FreezeAccountRequest) returns (AccountResponse);
+  rpc UnfreezeAccount(UnfreezeAccountRequest) returns (AccountResponse);
+  rpc CloseAccount(CloseAccountRequest) returns (AccountResponse);
+  rpc CreditBalance(CreditBalanceRequest) returns (BalanceOperationResponse);
+  rpc DebitBalance(DebitBalanceRequest) returns (BalanceOperationResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+enum AccountStatus {
+  ACCOUNT_STATUS_UNSPECIFIED = 0;
+  ACCOUNT_STATUS_ACTIVE = 1;
+  ACCOUNT_STATUS_BLOCKED = 2;
+  ACCOUNT_STATUS_CLOSED = 3;
+}
+
+enum AccountType {
+  ACCOUNT_TYPE_UNSPECIFIED = 0;
+  ACCOUNT_TYPE_CHECKING = 1;
+  ACCOUNT_TYPE_SAVINGS = 2;
+  ACCOUNT_TYPE_BUSINESS = 3;
+}
+
+message Account {
+  string id = 1;
+  string user_id = 2;
+  string account_number = 3;
+  AccountType account_type = 4;
+  string currency = 5;
+  int64 balance = 6;
+  AccountStatus status = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message CreateAccountRequest {
+  string user_id = 1;
+  AccountType account_type = 2;
+  string currency = 3;
+}
+
+message GetAccountByIdRequest {
+  string account_id = 1;
+}
+
+message GetAccountByNumberRequest {
+  string account_number = 1;
+}
+
+message GetAccountsByUserIdRequest {
+  string user_id = 1;
+}
+
+message GetAccountsByUserIdResponse {
+  repeated Account accounts = 1;
+}
+
+message GetBalanceRequest {
+  string account_id = 1;
+}
+
+message GetBalanceResponse {
+  string account_id = 1;
+  int64 balance = 2;
+  string currency = 3;
+  AccountStatus status = 4;
+}
+
+message UpdateAccountStatusRequest {
+  string account_id = 1;
+  AccountStatus status = 2;
+}
+
+message FreezeAccountRequest {
+  string account_id = 1;
+}
+
+message UnfreezeAccountRequest {
+  string account_id = 1;
+}
+
+message CloseAccountRequest {
+  string account_id = 1;
+}
+
+message CreditBalanceRequest {
+  string account_id = 1;
+  int64 amount = 2;
+  string source_service = 3;
+  string reference_id = 4;
+}
+
+message DebitBalanceRequest {
+  string account_id = 1;
+  int64 amount = 2;
+  string source_service = 3;
+  string reference_id = 4;
+}
+
+message AccountResponse {
+  Account account = 1;
+}
+
+message BalanceOperationResponse {
+  string account_id = 1;
+  int64 previous_balance = 2;
+  int64 current_balance = 3;
+  string currency = 4;
+  AccountStatus status = 5;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string status = 1;
+}
